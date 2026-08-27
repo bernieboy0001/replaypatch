@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: replaypatch
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: npm install && npx playwright install chromium && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-5.5
+      - key: TARGET_URL
+        value: file://./sample-app/index.html
+      - key: TARGET_REPO
+        value: ./sample-app
