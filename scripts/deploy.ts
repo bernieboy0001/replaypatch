@@ -1,8 +1,9 @@
 import { ethers } from "ethers";
 
-// 0G Chain — EVM-compatible, same tooling as Ethereum
-const RPC   = process.env.OG_RPC_URL   || "https://evm.0g.ai";
-const CHAIN = parseInt(process.env.OG_CHAIN_ID || "12345");
+// 0G Galileo Testnet — EVM-compatible, same tooling as Ethereum.
+// Free testnet tokens from https://faucet.0g.ai
+const RPC   = process.env.OG_RPC_URL   || "https://evmrpc-testnet.0g.ai";
+const CHAIN = parseInt(process.env.OG_CHAIN_ID || "16602");
 
 const ABI = [
   "function report(bytes32 recordingHash, string summary) returns (bytes32)",
@@ -30,7 +31,7 @@ async function main() {
   const addr = await contract.getAddress();
 
   console.log("\n✓ QAVerifier deployed to:", addr);
-  console.log("  Explorer:", process.env.OG_EXPLORER || "https://explorer.0g.ai", "/address/" + addr);
+  console.log("  Explorer:", process.env.OG_EXPLORER || "https://chainscan-galileo.0g.ai", "/address/" + addr);
   console.log("\nAdd to .env / Render:");
   console.log("  OG_CONTRACT_ADDRESS=" + addr);
 }

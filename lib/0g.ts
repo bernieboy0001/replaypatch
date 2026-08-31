@@ -2,9 +2,10 @@ import { ethers } from "ethers";
 import fs from "fs";
 import path from "path";
 
-// ── 0G Chain config ──────────────────────────────────────────────────────────
-const OG_RPC = process.env.OG_RPC_URL || "https://evm.0g.ai";
-const OG_CHAIN_ID = parseInt(process.env.OG_CHAIN_ID || "12345"); // mainnet placeholder
+// ── 0G Galileo Testnet config ────────────────────────────────────────────────
+// Defaults point at 0G testnet so integration works with free faucet tokens.
+const OG_RPC = process.env.OG_RPC_URL || "https://evmrpc-testnet.0g.ai";
+const OG_CHAIN_ID = parseInt(process.env.OG_CHAIN_ID || "16602");
 const CONTRACT_ADDRESS = process.env.OG_CONTRACT_ADDRESS || "";
 const RELAYER_PRIVATE_KEY = process.env.OG_PRIVATE_KEY || "";
 
@@ -79,4 +80,7 @@ export function isOGConfigured(): boolean {
   return !!(CONTRACT_ADDRESS && RELAYER_PRIVATE_KEY);
 }
 
-export const OG_EXPLORER = process.env.OG_EXPLORER || "https://explorer.0g.ai";
+export const OG_EXPLORER =
+  process.env.OG_EXPLORER || "https://chainscan-galileo.0g.ai";
+export const OG_STORAGE_EXPLORER =
+  process.env.OG_STORAGE_EXPLORER || "https://storagescan-galileo.0g.ai";

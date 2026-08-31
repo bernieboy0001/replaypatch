@@ -43,26 +43,32 @@ npm run dev
 
 Open http://localhost:3000, upload a bug video, watch the pipeline.
 
-## 0G integration
+## 0G integration (Galileo Testnet)
 
-Every verification cycle stores two proofs on 0G:
+Every verification cycle stores two proofs on **0G Galileo Testnet**:
 
 1. **0G Storage** — the original bug recording is uploaded permanently
 2. **0G Chain** — a `QAVerifier` contract records the recording hash, test result,
    patch hash, and timestamp
 
+Everything runs on testnet by default, so it's free — get 0.1 0G/day from the
+faucet at https://faucet.0g.ai (0.1 0G/day).
+
+| Network | Chain ID | RPC | Explorer |
+| ------- | -------- | --- | -------- |
+| Galileo Testnet | 16602 | https://evmrpc-testnet.0g.ai | https://chainscan-galileo.0g.ai |
+| Mainnet | 16661 | https://evmrpc.0g.ai | https://chainscan.0g.ai |
+
 ### Deploy the contract
 
 ```bash
-# 0. get 0G tokens
-#    testnet: https://faucet.0g.ai  (free)
-#    mainnet: https://get.0g.ai     (exchanges, bridges, fiat routes)
-#    docs: https://docs.0g.ai
+# 0. get free testnet tokens
+#    https://faucet.0g.ai
 
 # 1. compile the contract (requires solc or forge)
 npx hardhat compile          # or: forge build
 
-# 2. deploy to 0G mainnet (needs real 0G for gas)
+# 2. deploy to 0G Galileo testnet
 npx ts-node scripts/deploy.ts
 # → prints the contract address
 
@@ -70,6 +76,13 @@ npx ts-node scripts/deploy.ts
 echo "OG_CONTRACT_ADDRESS=<address from step 2>" >> .env
 echo "OG_PRIVATE_KEY=<your wallet key>"          >> .env
 ```
+
+To target mainnet later, override in `.env`:
+```
+OG_RPC_URL=https://evmrpc.0g.ai
+OG_CHAIN_ID=16661
+```
+Mainnet 0G must be bought or bridged via https://get.0g.ai — there is no mainnet faucet.
 
 After deployment, every pipeline run commits to 0G automatically. The UI shows
 the report tx and verify tx with links to the 0G Explorer.
@@ -89,11 +102,12 @@ loop (video → failing test → patch → green) still works.
 | `TARGET_URL`          | Where the generated test runs (`file://` or http).   |
 | `TARGET_REPO`         | Folder the patcher may read/write.                   |
 | `GITHUB_TOKEN`        | Optional — opens a PR with the fix.                  |
-| `OG_RPC_URL`          | 0G Chain RPC (default `https://evm.0g.ai`).          |
-| `OG_CHAIN_ID`         | 0G Chain ID (default `12345`).                       |
+| `OG_RPC_URL`          | 0G Chain RPC (default testnet `https://evmrpc-testnet.0g.ai`). |
+| `OG_CHAIN_ID`         | 0G Chain ID (default `16602` testnet).                  |
 | `OG_PRIVATE_KEY`      | Wallet key for writing to 0G Chain.                  |
-| `OG_CONTRACT_ADDRESS` | QAVerifier address on 0G mainnet.                    |
-| `OG_EXPLORER`         | 0G Explorer base URL.                                |
+| `OG_CONTRACT_ADDRESS` | QAVerifier address.                                    |
+| `OG_EXPLORER`         | 0G chain explorer (default Galileo chainscan).         |
+| `OG_STORAGE_EXPLORER` | 0G storage explorer (default Galileo storagescan).     |
 
 ## Stack
 
