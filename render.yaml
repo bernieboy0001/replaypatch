@@ -19,3 +19,13 @@ services:
         value: file://./sample-app/index.html
       - key: TARGET_REPO
         value: ./sample-app
+      - key: OG_RPC_URL
+        value: https://evm.0g.ai
+      - key: OG_CHAIN_ID
+        value: "12345"
+      - key: OG_PRIVATE_KEY
+        sync: false
+      - key: OG_CONTRACT_ADDRESS
+        sync: false
+      - key: OG_EXPLORER
+        value: https://explorer.0g.ai

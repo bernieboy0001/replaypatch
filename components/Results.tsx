@@ -139,6 +139,49 @@ export default function Results({ result }: { result: AnalysisResult }) {
           PR opened: <a href={result.prUrl}>{result.prUrl}</a>
         </p>
       )}
+
+      {result.ogProof && (
+        <Stage status="ok" title="Committed to 0G Chain">
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div className="body-text">
+              <b style={{ color: "var(--text)" }}>Recording hash:</b>{" "}
+              <code style={{ color: "var(--accent-2)", fontFamily: "var(--mono)" }}>
+                {result.ogProof.recordingHash.slice(0, 18)}…
+              </code>
+            </div>
+            <div className="body-text">
+              <b style={{ color: "var(--text)" }}>Report tx:</b>{" "}
+              <a
+                href={result.ogProof.explorerUrl.replace("/tx/" + result.ogProof.verifyTxHash, "/tx/" + result.ogProof.reportTxHash)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "var(--blue)" }}
+              >
+                {result.ogProof.reportTxHash.slice(0, 18)}…
+              </a>
+            </div>
+            <div className="body-text">
+              <b style={{ color: "var(--text)" }}>Verify tx:</b>{" "}
+              <a
+                href={result.ogProof.explorerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "var(--green)" }}
+              >
+                {result.ogProof.verifyTxHash?.slice(0, 18)}…
+              </a>
+            </div>
+          </div>
+        </Stage>
+      )}
+
+      {!result.ogProof && !result.demo && (
+        <Stage status="plain" title="0G integration">
+          <p className="body-text">
+            Set <code>OG_CONTRACT_ADDRESS</code> and <code>OG_PRIVATE_KEY</code> in <code>.env</code> to store every verification on 0G Chain.
+          </p>
+        </Stage>
+      )}
     </div>
   );
 }

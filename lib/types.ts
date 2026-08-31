@@ -18,6 +18,14 @@ export interface PatchResult {
   after: string;
 }
 
+export interface OGProof {
+  recordingHash: string;       // 0G Storage content hash
+  reportId: string;            // on-chain report id
+  reportTxHash: string;        // report() tx on 0G Chain
+  verifyTxHash: string | null; // verify() tx on 0G Chain
+  explorerUrl: string;         // link to 0G Explorer
+}
+
 export interface AnalysisResult {
   demo: boolean;
   frames: string[];
@@ -35,4 +43,5 @@ export interface AnalysisResult {
     output: string;
   } | null;
   prUrl: string | null;
+  ogProof: OGProof | null;
 }

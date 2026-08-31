@@ -6,6 +6,7 @@ import { analyzeVideo, generateTest, generatePatch, isDemo } from "@/lib/openai"
 import { runTest } from "@/lib/playwright";
 import { applyPatch, readRepo } from "@/lib/patch";
 import { AnalysisResult } from "@/lib/types";
+import { uploadToOGStorage, reportToChain, verifyOnChain, isOGConfigured, OG_EXPLORER } from "@/lib/0g";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,12 @@ export async function POST(req: NextRequest) {
     const videoPath = path.join(tmp, "video" + path.extname(file.name || ".mp4"));
     fs.writeFileSync(videoPath, Buffer.from(await file.arrayBuffer()));
 
+    // ── 0G Storage: upload the bug recording ──────────────────────────────────
+    let recordingHash = "";
+    if (isOGConfigured()) {
+      try { recordingHash = await uploadToOGStorage(videoPath); } catch {}
+    }
+
     const framePaths = await extractFrames(videoPath, path.join(tmp, "frames"), 8);
     const frames = framePaths.map(frameToDataUrl);
 
@@ -64,6 +71,31 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ── 0G Chain: commit the verification result ──────────────────────────────
+    let ogProof = null;
+    if (isOGConfigured() && recordingHash) {
+      try {
+        const { id, txHash: reportTxHash } = await reportToChain(
+          recordingHash,
+          analysis.summary
+        );
+        const patchHash = patchResult?.length
+          ? (await import("ethers")).ethers.keccak256(
+              Buffer.from(patchResult.map((p) => p.after).join("\n"))
+            )
+          : "";
+        const passed = rerun?.passed ?? false;
+        const { txHash: verifyTxHash } = await verifyOnChain(id, passed, patchHash);
+        ogProof = {
+          recordingHash,
+          reportId: id,
+          reportTxHash,
+          verifyTxHash,
+          explorerUrl: OG_EXPLORER + "/tx/" + verifyTxHash,
+        };
+      } catch {}
+    }
+
     const result: AnalysisResult = {
       demo: isDemo,
       frames,
@@ -75,6 +107,7 @@ export async function POST(req: NextRequest) {
       patch: patchResult,
       rerun,
       prUrl: null,
+      ogProof,
     };
 
     return NextResponse.json(result);

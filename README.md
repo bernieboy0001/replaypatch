@@ -1,10 +1,8 @@
 # ReplayPatch
 
 > Upload a screen recording of a bug. ReplayPatch turns it into a failing
-> Playwright test, fixes the code with GPT-5.5, reruns the test, and proves the fix.
-
-The recording becomes a permanent regression test. QA videos stop being throwaway
-evidence and start being executable specifications.
+> Playwright test, fixes the code with GPT-5.5, reruns the test, and proves the fix —
+> all committed permanently to **0G Chain** and stored on **0G Storage**.
 
 ## How it works
 
@@ -13,7 +11,7 @@ video upload
    │
    ▼
 ffmpeg (bundled) extracts key frames
-   │
+   │  └──► bug recording uploaded to 0G Storage (permanent)
    ▼
 GPT-5.5 watches the frames → repro steps + expected behavior
    │
@@ -30,7 +28,7 @@ GPT-5.5 reads the failing output + source → patches the code
 Playwright reruns → fix verified (passes)
    │
    ▼
-(optional) GitHub PR opened with the patch
+verification result committed to 0G Chain (immutable proof)
 ```
 
 ## Quick start
@@ -45,30 +43,67 @@ npm run dev
 
 Open http://localhost:3000, upload a bug video, watch the pipeline.
 
+## 0G integration
+
+Every verification cycle stores two proofs on 0G:
+
+1. **0G Storage** — the original bug recording is uploaded permanently
+2. **0G Chain** — a `QAVerifier` contract records the recording hash, test result,
+   patch hash, and timestamp
+
+### Deploy the contract
+
+```bash
+# 1. compile the contract (requires solc or forge)
+npx hardhat compile          # or: forge build
+
+# 2. deploy to 0G mainnet
+npx ts-node scripts/deploy.ts
+# → prints the contract address
+
+# 3. add it to .env
+echo "OG_CONTRACT_ADDRESS=<address from step 2>" >> .env
+echo "OG_PRIVATE_KEY=<your wallet key>"          >> .env
+```
+
+After deployment, every pipeline run commits to 0G automatically. The UI shows
+the report tx and verify tx with links to the 0G Explorer.
+
 ## Demo mode (no API key)
 
 If `OPENAI_API_KEY` is unset, ReplayPatch runs in **demo mode** against the
-bundled sample bug in `sample-app/`:
-
-- `sample-app/index.html` — a button that should open a modal
-- `sample-app/app.js` — has a `visiblity` typo so the modal never shows
-
-The pipeline reproduces the bug, patches `app.js`, and reruns to green — no
-OpenAI calls required. This is what the deployed hackathon demo shows.
+bundled sample bug in `sample-app/`. No OpenAI calls, no 0G writes. The full
+loop (video → failing test → patch → green) still works.
 
 ## Config
 
-| Env var          | Purpose                                              |
-| ---------------- | ---------------------------------------------------- |
-| `OPENAI_API_KEY` | Required for live analysis. Else demo mode.          |
-| `OPENAI_MODEL`   | Model id (default `gpt-5.5`).                        |
-| `TARGET_URL`     | Where the generated test runs (`file://` or http).   |
-| `TARGET_REPO`    | Folder the patcher may read/write.                   |
-| `GITHUB_TOKEN`   | Optional — opens a PR with the fix.                  |
+| Env var               | Purpose                                              |
+| --------------------- | ---------------------------------------------------- |
+| `OPENAI_API_KEY`      | Required for live analysis. Else demo mode.          |
+| `OPENAI_MODEL`        | Model id (default `gpt-5.5`).                        |
+| `TARGET_URL`          | Where the generated test runs (`file://` or http).   |
+| `TARGET_REPO`         | Folder the patcher may read/write.                   |
+| `GITHUB_TOKEN`        | Optional — opens a PR with the fix.                  |
+| `OG_RPC_URL`          | 0G Chain RPC (default `https://evm.0g.ai`).          |
+| `OG_CHAIN_ID`         | 0G Chain ID (default `12345`).                       |
+| `OG_PRIVATE_KEY`      | Wallet key for writing to 0G Chain.                  |
+| `OG_CONTRACT_ADDRESS` | QAVerifier address on 0G mainnet.                    |
+| `OG_EXPLORER`         | 0G Explorer base URL.                                |
 
 ## Stack
 
-- Next.js 15 (App Router) + React 19
-- OpenAI SDK (vision + code repair)
-- Playwright (test generation + execution)
-- ffmpeg-static (no system ffmpeg needed)
+- **Next.js 15** (App Router) + **React 19**
+- **OpenAI SDK** (GPT-5.5 vision + code repair)
+- **Playwright** (test generation + execution)
+- **ffmpeg-static** (bundled binary, no system install)
+- **ethers.js v6** (0G Chain interaction)
+- **0G Chain** (immutable verification proofs)
+- **0G Storage** (permanent bug recording archive)
+
+## 🏆 0G Bridge by AKINDO — Wave 3 Submission
+
+Built for the [0G Bridge Buildathon](https://app.akindo.io/wave-hacks/Z4MlX4vreI72ol6pd).
+Every bug fix is now a verifiable, on-chain record.
+
+- `#0GBridge` `#BuildOn0G`
+- @0G_labs @0G_Builders @AKINDO_io
