@@ -54,10 +54,15 @@ Every verification cycle stores two proofs on 0G:
 ### Deploy the contract
 
 ```bash
+# 0. get 0G tokens
+#    testnet: https://faucet.0g.ai  (free)
+#    mainnet: https://get.0g.ai     (exchanges, bridges, fiat routes)
+#    docs: https://docs.0g.ai
+
 # 1. compile the contract (requires solc or forge)
 npx hardhat compile          # or: forge build
 
-# 2. deploy to 0G mainnet
+# 2. deploy to 0G mainnet (needs real 0G for gas)
 npx ts-node scripts/deploy.ts
 # → prints the contract address
 
