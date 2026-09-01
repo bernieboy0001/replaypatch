@@ -1,16 +1,11 @@
 import { ethers } from "ethers";
+import fs from "fs";
+import path from "path";
 
 // 0G Galileo Testnet — EVM-compatible, same tooling as Ethereum.
 // Free testnet tokens from https://faucet.0g.ai
 const RPC   = process.env.OG_RPC_URL   || "https://evmrpc-testnet.0g.ai";
 const CHAIN = parseInt(process.env.OG_CHAIN_ID || "16602");
-
-const ABI = [
-  "function report(bytes32 recordingHash, string summary) returns (bytes32)",
-  "function verify(bytes32 id, bool passed, bytes32 patchHash) returns ()",
-  "function count() view returns (uint256)",
-  "event BugReported(bytes32 indexed id, address indexed agent, bytes32 recordingHash, uint256 timestamp)",
-];
 
 async function main() {
   const pk = process.env.OG_PRIVATE_KEY;
@@ -20,12 +15,16 @@ async function main() {
   const wallet   = new ethers.Wallet(pk, provider);
   console.log("Deployer:", wallet.address);
   console.log("Balance:", ethers.formatEther(await provider.getBalance(wallet.address)), "OG");
+  if ((await provider.getBalance(wallet.address)) === 0n) {
+    console.error("\n✗ Wallet has 0 OG — add gas before deploying.");
+    process.exit(1);
+  }
 
   // Deploy QAVerifier
-  const artifact = JSON.parse(
-    require("fs").readFileSync("artifacts/QAVerifier.json", "utf8")
-  );
+  const artifactPath = path.join(process.cwd(), "artifacts", "QAVerifier.json");
+  const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
   const factory = new ethers.ContractFactory(artifact.abi, artifact.bytecode, wallet);
+  console.log("Deploying QAVerifier…");
   const contract = await factory.deploy();
   await contract.waitForDeployment();
   const addr = await contract.getAddress();

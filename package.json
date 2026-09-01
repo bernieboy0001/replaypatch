@@ -6,24 +6,29 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "compile": "ts-node scripts/compile.ts",
+    "deploy": "ts-node scripts/deploy.ts",
+    "proof": "ts-node scripts/proof.ts"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
+    "ethers": "^6.13.0",
+    "ffmpeg-static": "^5.2.0",
     "next": "^15.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "openai": "^4.77.0",
     "playwright": "^1.49.0",
-    "ffmpeg-static": "^5.2.0",
-    "ethers": "^6.13.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.0",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0"
+    "@types/react-dom": "^19.0.0",
+    "solc": "^0.8.26",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.0"
   }
 }
