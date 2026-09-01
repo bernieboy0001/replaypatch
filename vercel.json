@@ -1,0 +1,18 @@
+{
+  "services": {
+    "replaypatch": {
+      "root": ".",
+      "framework": "nextjs",
+      "buildCommand": "npm install && npx playwright install chromium && npm run build"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "replaypatch"
+      }
+    }
+  ]
+}

@@ -18,6 +18,19 @@ function getWallet() {
   return new ethers.Wallet(RELAYER_PRIVATE_KEY, getProvider());
 }
 
+async function waitForReceipt(provider: ethers.Provider, hash: string, tries = 20) {
+  for (let i = 0; i < tries; i++) {
+    try {
+      const r = await provider.getTransactionReceipt(hash);
+      if (r) return r;
+    } catch {
+      // 0G public RPC can lag; retry.
+    }
+    await new Promise((res) => setTimeout(res, 3000));
+  }
+  throw new Error("receipt timeout for " + hash);
+}
+
 // ── ABI (minimal, matched to QAVerifier.sol) ─────────────────────────────────
 const ABI = [
   "function report(bytes32 recordingHash, string summary) returns (bytes32)",
@@ -53,7 +66,7 @@ export async function reportToChain(
   const wallet = getWallet();
   const contract = getContract(wallet);
   const tx = await contract.report(recordingHash, summary);
-  const receipt = await tx.wait();
+  const receipt = await waitForReceipt(getProvider(), tx.hash);
   // extract report id from event
   const event = receipt.logs?.find((l: any) => {
     try { return contract.interface.parseLog(l)?.name === "BugReported"; } catch { return false; }
@@ -72,7 +85,7 @@ export async function verifyOnChain(
   const wallet = getWallet();
   const contract = getContract(wallet);
   const tx = await contract.verify(reportId, passed, patchHash);
-  const receipt = await tx.wait();
+  const receipt = await waitForReceipt(getProvider(), tx.hash);
   return { txHash: receipt.hash };
 }
 
