@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { extractFrames, frameToDataUrl, tmpDir } from "@/lib/frames";
-import { analyzeVideo, generateTest, generatePatch, isDemo } from "@/lib/openai";
-import { runTest } from "@/lib/playwright";
-import { applyPatch, readRepo } from "@/lib/patch";
-import { AnalysisResult } from "@/lib/types";
-import { uploadToOGStorage, reportToChain, verifyOnChain, isOGConfigured, OG_EXPLORER } from "@/lib/0g";
+import { extractFrames, frameToDataUrl, tmpDir } from "../../../lib/frames";
+import { analyzeVideo, generateTest, generatePatch, isDemo } from "../../../lib/openai";
+import { runTest } from "../../../lib/playwright";
+import { applyPatch, readRepo } from "../../../lib/patch";
+import { AnalysisResult } from "../../../lib/types";
+import { uploadToOGStorage, reportToChain, verifyOnChain, isOGConfigured, OG_EXPLORER } from "../../../lib/0g";
 
 export const dynamic = "force-dynamic";
 
