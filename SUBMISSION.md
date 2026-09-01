@@ -59,9 +59,9 @@ ReplayPatch uploads a bug recording, extracts frames, has GPT-5.5 reconstruct re
 - 0G Storage — bug recordings archived permanently
 
 **On-chain activity proof (QAVerifier `0x43D39f...DB11`)**
-- report(): https://chainscan.0g.ai/tx/0xffd6392c9e35c3d25bf388d7c650c60ef8782c774719a185bb03a12d2506167b
-- verify(): https://chainscan.0g.ai/tx/0x1cbccba9cad91826e9947662b7f59332d40ef28f013462b9609518a92bd6ed60
-- Contract records on chain: 2 (report + verification with patch hash)
+- report(): https://chainscan.0g.ai/tx/0xf665949769444cb669a40a89b6635fd006d087db9263b0bd03352732eca924130
+- verify(): https://chainscan.0g.ai/tx/0x7e0b67bcef727a7b2875dbf03d66c2affc84948e1292d1eb12796fde81aeaebe
+- Contract records on chain: 4+ (report + verification with patch hash, latest run via the deployed API)
 
 **Code repository**
 `<your github repo>` (public, README + meaningful commits)
