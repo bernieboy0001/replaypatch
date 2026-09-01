@@ -20,14 +20,14 @@ services:
       - key: TARGET_REPO
         value: ./sample-app
       - key: OG_RPC_URL
-        value: https://evmrpc-testnet.0g.ai
+        value: https://evmrpc.0g.ai
       - key: OG_CHAIN_ID
-        value: "16602"
+        value: "16661"
       - key: OG_PRIVATE_KEY
         sync: false
       - key: OG_CONTRACT_ADDRESS
-        sync: false
+        value: 0x43D39f423baf019675D407C0444471da00cbDB11
       - key: OG_EXPLORER
-        value: https://chainscan-galileo.0g.ai
+        value: https://chainscan.0g.ai
       - key: OG_STORAGE_EXPLORER
-        value: https://storagescan-galileo.0g.ai
+        value: https://storagescan.0g.ai
