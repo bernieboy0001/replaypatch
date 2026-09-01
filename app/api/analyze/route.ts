@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { extractFrames, frameToDataUrl, tmpDir } from "../../../lib/frames";
 import { analyzeVideo, generateTest, generatePatch, isDemo } from "../../../lib/openai";
-import { runTest } from "../../../lib/playwright";
+import { runTest, DEMO_FIRST_RUN, DEMO_RERUN } from "../../../lib/playwright";
 import { applyPatch, readRepo } from "../../../lib/patch";
 import { AnalysisResult } from "../../../lib/types";
 import { uploadToOGStorage, reportToChain, verifyOnChain, isOGConfigured, OG_EXPLORER } from "../../../lib/0g";
@@ -20,6 +20,20 @@ function resolveTarget(raw: string): string {
   return raw;
 }
 
+// Copy a folder recursively (skipping heavy dirs) so patching happens on a
+// writable sandbox. The serverless filesystem is read-only, so we cannot patch
+// ./sample-app in place on Vercel.
+function copyRepo(src: string, dest: string) {
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    if (entry.name === "node_modules" || entry.name === ".git") continue;
+    const from = path.join(src, entry.name);
+    const to = path.join(dest, entry.name);
+    if (entry.isDirectory()) copyRepo(from, to);
+    else fs.copyFileSync(from, to);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const form = await req.formData();
@@ -30,15 +44,26 @@ export async function POST(req: NextRequest) {
       (form.get("targetUrl") as string) ||
       process.env.TARGET_URL ||
       "file://./sample-app/index.html";
-    const targetUrl = resolveTarget(urlArg);
-    const repoDir = path.resolve(repoArg);
+    const workDir = path.resolve(process.cwd());
+    const tmp = tmpDir();
+
+    // Patch the repo in a writable sandbox (serverless fs is read-only).
+    const srcRepo = path.resolve(repoArg);
+    const sandboxRepo = path.join(tmp, "sandbox");
+    let repoDir = srcRepo;
+    let targetUrl = resolveTarget(urlArg);
+    if (fs.existsSync(srcRepo)) {
+      copyRepo(srcRepo, sandboxRepo);
+      repoDir = sandboxRepo;
+      if (urlArg.includes("./sample-app")) {
+        targetUrl = "file://" + path.join(sandboxRepo, "index.html");
+      }
+    }
 
     if (!file) {
       return NextResponse.json({ error: "No video uploaded" }, { status: 400 });
     }
 
-    const workDir = path.resolve(process.cwd());
-    const tmp = tmpDir();
     const videoPath = path.join(tmp, "video" + path.extname(file.name || ".mp4"));
     fs.writeFileSync(videoPath, Buffer.from(await file.arrayBuffer()));
 
@@ -54,7 +79,10 @@ export async function POST(req: NextRequest) {
     const analysis = await analyzeVideo(framePaths);
     const testCode = await generateTest(analysis, targetUrl);
 
-    const firstRun = await runTest(testCode, workDir);
+    // On serverless (Vercel) demo mode the chromium binary can't ship inside
+    // the function, so we use scripted run outputs. Real runs happen locally.
+    const simulated = process.env.VERCEL === "1" && isDemo;
+    const firstRun = await runTest(testCode, workDir, simulated ? DEMO_FIRST_RUN : undefined);
     let patchResult = null;
     let rerun = null;
 
@@ -67,7 +95,7 @@ export async function POST(req: NextRequest) {
       });
       if (files.length) {
         patchResult = applyPatch(repoDir, files);
-        rerun = await runTest(testCode, workDir);
+        rerun = await runTest(testCode, workDir, simulated ? DEMO_RERUN : undefined);
       }
     }
 

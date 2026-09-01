@@ -3,7 +3,7 @@
     "replaypatch": {
       "root": ".",
       "framework": "nextjs",
-      "buildCommand": "npm install --include=dev && npx playwright install chromium && npm run build"
+      "buildCommand": "npm install --include=dev && npm rebuild ffmpeg-static && npm run build"
     }
   },
   "rewrites": [
