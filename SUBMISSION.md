@@ -1,7 +1,7 @@
 # ReplayPatch — 0G Bridge Wave 3 Submission Kit
 
-Everything you need to submit today. All 0G integration is on **Galileo Testnet**
-(Chain ID 16602) — free via the faucet.
+Everything you need to submit today. The QAVerifier contract is **live on 0G Mainnet**
+(Chain ID 16661) with verified on-chain proof.
 
 ---
 
@@ -11,7 +11,7 @@ Everything you need to submit today. All 0G integration is on **Galileo Testnet*
 >
 > 🎬 Upload a screen recording → GPT-5.5 watches the frames → writes a Playwright test → patches the code → reruns and verifies the fix.
 >
-> ⛓ Every recording, test result, and patch is committed to **0G Galileo Testnet** via a QAVerifier contract — on-chain, verifiable QA. Bug reports stop being trusting screenshots and start being auditable AI work.
+> ⛓ Every recording, test result, and patch is committed to **0G Mainnet** via a QAVerifier contract — on-chain, verifiable QA. Bug reports stop being trusting screenshots and start being auditable AI work.
 >
 > Demo + repo: replaypatch.vercel.app
 >
@@ -36,7 +36,7 @@ Show the generated Playwright test. It runs and FAILS — the bug is reproduced.
 GPT-5.5 reads the failing output + source, writes the patch. Rerun → PASS. "The fix is proven in the same test that caught the bug."
 
 **2:20–2:50 — 0G on-chain proof**
-Show the QAVerifier tx on chainscan-galileo.0g.ai — recording hash, verification result, patch hash, timestamp. "Every fix is now an immutable, verifiable record on 0G."
+Show a QAVerifier tx on chainscan.0g.ai — recording hash, verification result, patch hash, timestamp. "Every fix is now an immutable, verifiable record on 0G." (Live example below.)
 
 **2:50–3:00 — Close**
 "ReplayPatch. AI QA you can audit. Built on 0G." (+ logo)
@@ -52,11 +52,16 @@ ReplayPatch
 AI that turns bug screen-recordings into verified pull requests — permanently recorded on 0G Chain and Storage.
 
 **Summary (what it does, problem, 0G components)**
-ReplayPatch uploads a bug recording, extracts frames, has GPT-5.5 reconstruct repro steps and write a Playwright test, then patches the source and reruns to prove the fix. It uses **0G Chain** (QAVerifier contract records recording hash, test result, patch hash) and **0G Storage** (permanent recording archive) on Galileo Testnet.
+ReplayPatch uploads a bug recording, extracts frames, has GPT-5.5 reconstruct repro steps and write a Playwright test, then patches the source and reruns to prove the fix. It uses **0G Chain** (QAVerifier contract records recording hash, test result, patch hash) and **0G Storage** (permanent recording archive) on 0G Mainnet.
 
 **0G components used**
-- 0G Chain (testnet `16602`) — QAVerifier contract, verified on chainscan-galileo
+- 0G Chain (mainnet `16661`) — QAVerifier contract `0x43D39f423baf019675D407C0444471da00cbDB11` on [chainscan.0g.ai](https://chainscan.0g.ai/address/0x43D39f423baf019675D407C0444471da00cbDB11)
 - 0G Storage — bug recordings archived permanently
+
+**On-chain activity proof (QAVerifier `0x43D39f...DB11`)**
+- report(): https://chainscan.0g.ai/tx/0xffd6392c9e35c3d25bf388d7c650c60ef8782c774719a185bb03a12d2506167b
+- verify(): https://chainscan.0g.ai/tx/0x1cbccba9cad91826e9947662b7f59332d40ef28f013462b9609518a92bd6ed60
+- Contract records on chain: 2 (report + verification with patch hash)
 
 **Code repository**
 `<your github repo>` (public, README + meaningful commits)
@@ -73,8 +78,8 @@ replaypatch.vercel.app
 ---
 
 ## 4. Commit checklist (Wave 3)
-- [ ] Deploy QAVerifier to Galileo testnet → set `OG_CONTRACT_ADDRESS` + `OG_PRIVATE_KEY`
-- [ ] Run the pipeline once live → capture the chainscan-galileo explorer link as proof
+- [x] Deploy QAVerifier to 0G Mainnet (16661) → contract `0x43D39f423baf019675D407C0444471da00cbDB11`
+- [x] Produce on-chain proof → report + verify txs recorded (links above)
 - [ ] Record 3-min video (script above)
 - [ ] Push code to GitHub (public) with README
 - [ ] Post on X + reply with link

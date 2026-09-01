@@ -13,7 +13,7 @@ function CopyBtn({ text }: { text: string }) {
         setTimeout(() => setCopied(false), 1200);
       }}
     >
-      {copied ? "copied" : "copy"}
+      {copied ? "copied ✓" : "copy"}
     </button>
   );
 }
@@ -22,7 +22,16 @@ function Code({ fname, code, term, diff }: { fname: string; code: string; term?:
   return (
     <div className="codewrap">
       <div className="codebar">
-        <span className="fname">{fname}</span>
+        <div className="codebar-left">
+          <div className="dots">
+            <i />
+            <i />
+            <i />
+          </div>
+          <span className="fname">{fname}</span>
+          {term && <span className="tag">run</span>}
+          {diff && <span className="tag" style={{ color: "var(--green)", background: "rgba(61,220,132,0.1)", borderColor: "rgba(61,220,132,0.3)" }}>patch</span>}
+        </div>
         <CopyBtn text={code} />
       </div>
       <pre className={"code" + (term ? " term" : "") + (diff ? " diff" : "")}>{code}</pre>
@@ -39,7 +48,7 @@ function Stage({
   title: React.ReactNode;
   children?: React.ReactNode;
 }) {
-  const mark = status === "ok" ? "✓" : status === "bad" ? "✗" : status === "run" ? "▸" : "•";
+  const mark = status === "ok" ? "✓" : status === "bad" ? "✗" : status === "run" ? "→" : "·";
   return (
     <div className="stage">
       <div className={"marker " + (status === "plain" ? "" : status)}>{mark}</div>
@@ -51,9 +60,34 @@ function Stage({
   );
 }
 
+function Verdict({ result }: { result: AnalysisResult }) {
+  const fixed = result.rerun?.passed;
+  return (
+    <div className="verdict">
+      <div className="v-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 12l5 5L20 6" />
+        </svg>
+      </div>
+      <div>
+        <div className="v-title">{fixed ? "Bug fixed — fix verified" : "Analysis complete"}</div>
+        <div className="v-sub">
+          {fixed
+            ? "The same test that caught the bug now passes after the patch."
+            : result.demo
+              ? "Demo run — sample-bug pipeline executed end to end."
+              : "Pipeline ran against your recording."}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Results({ result }: { result: AnalysisResult }) {
   return (
     <div className="pipeline">
+      <Verdict result={result} />
+
       <Stage status="ok" title="Frames extracted">
         {result.frames.length > 0 ? (
           <div className="frames">
@@ -142,35 +176,46 @@ export default function Results({ result }: { result: AnalysisResult }) {
 
       {result.ogProof && (
         <Stage status="ok" title="Committed to 0G Chain">
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <div className="body-text">
-              <b style={{ color: "var(--text)" }}>Recording hash:</b>{" "}
-              <code style={{ color: "var(--accent-2)", fontFamily: "var(--mono)" }}>
-                {result.ogProof.recordingHash.slice(0, 18)}…
-              </code>
+          <div className="chain-rows">
+            <div className="chain-row">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M9 12h6" />
+                <path d="M11 7l1.5-1.5a4.24 4.24 0 016 6L17 13" />
+                <path d="M13 17l-1.5 1.5a4.24 4.24 0 01-6-6L7 11" />
+              </svg>
+              <span className="label">Recording hash</span>
+              <span className="hash">{result.ogProof.recordingHash.slice(0, 20)}…</span>
             </div>
-            <div className="body-text">
-              <b style={{ color: "var(--text)" }}>Report tx:</b>{" "}
+            <div className="chain-row">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M9 12h6" />
+                <path d="M11 7l1.5-1.5a4.24 4.24 0 016 6L17 13" />
+                <path d="M13 17l-1.5 1.5a4.24 4.24 0 01-6-6L7 11" />
+              </svg>
+              <span className="label">Report tx</span>
+              <span className="hash">{result.ogProof.reportTxHash.slice(0, 20)}…</span>
               <a
                 href={result.ogProof.explorerUrl.replace("/tx/" + result.ogProof.verifyTxHash, "/tx/" + result.ogProof.reportTxHash)}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: "var(--blue)" }}
               >
-                {result.ogProof.reportTxHash.slice(0, 18)}…
+                view on 0G Explorer ↗
               </a>
             </div>
-            <div className="body-text">
-              <b style={{ color: "var(--text)" }}>Verify tx:</b>{" "}
-              <a
-                href={result.ogProof.explorerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: "var(--green)" }}
-              >
-                {result.ogProof.verifyTxHash?.slice(0, 18)}…
-              </a>
-            </div>
+            {result.ogProof.verifyTxHash && (
+              <div className="chain-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M9 12h6" />
+                  <path d="M11 7l1.5-1.5a4.24 4.24 0 016 6L17 13" />
+                  <path d="M13 17l-1.5 1.5a4.24 4.24 0 01-6-6L7 11" />
+                </svg>
+                <span className="label">Verify tx</span>
+                <span className="hash">{result.ogProof.verifyTxHash.slice(0, 20)}…</span>
+                <a href={result.ogProof.explorerUrl} target="_blank" rel="noopener noreferrer">
+                  view on 0G Explorer ↗
+                </a>
+              </div>
+            )}
           </div>
         </Stage>
       )}
