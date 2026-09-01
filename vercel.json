@@ -3,7 +3,7 @@
     "replaypatch": {
       "root": ".",
       "framework": "nextjs",
-      "buildCommand": "npm install && npx playwright install chromium && npm run build"
+      "buildCommand": "npm install --include=dev && npx playwright install chromium && npm run build"
     }
   },
   "rewrites": [
