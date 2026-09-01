@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AnalysisResult } from "@/lib/types";
+import { AnalysisResult } from "../lib/types";
 
 function CopyBtn({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);

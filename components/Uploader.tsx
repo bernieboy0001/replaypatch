@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { AnalysisResult } from "@/lib/types";
+import { AnalysisResult } from "../lib/types";
 import Results from "./Results";
 import Reveal from "./Reveal";
 
