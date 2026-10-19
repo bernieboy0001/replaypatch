@@ -1,0 +1,145 @@
+{
+  "compiler-version": "0.31.1",
+  "language-version": "0.23.0",
+  "runtime-version": "0.16.0",
+  "circuits": [
+    {
+      "name": "attest",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "recordingHash",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "patchHash",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "ok",
+          "type": {
+            "type-name": "Boolean"
+          }
+        },
+        {
+          "name": "salt",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "verify",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "recordingHash",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "patchHash",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "ok",
+          "type": {
+            "type-name": "Boolean"
+          }
+        },
+        {
+          "name": "salt",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    }
+  ],
+  "witnesses": [
+    {
+      "name": "localReporterKey",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    }
+  ],
+  "contracts": [
+  ],
+  "ledger": [
+    {
+      "name": "attestationId",
+      "index": 0,
+      "exported": true,
+      "storage": "Cell",
+      "type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "reporter",
+      "index": 1,
+      "exported": true,
+      "storage": "Cell",
+      "type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "passed",
+      "index": 2,
+      "exported": true,
+      "storage": "Cell",
+      "type": {
+        "type-name": "Boolean"
+      }
+    },
+    {
+      "name": "sequence",
+      "index": 3,
+      "exported": true,
+      "storage": "Counter"
+    },
+    {
+      "name": "domainTag",
+      "index": 4,
+      "exported": true,
+      "storage": "Cell",
+      "type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    }
+  ]
+}

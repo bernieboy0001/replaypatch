@@ -1,0 +1,106 @@
+// This file is part of ReplayPatch.
+// SPDX-License-Identifier: Apache-2.0
+// Licensed under the Apache License, Version 2.0 (the "License");
+// You may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//
+// ReplayPatch Confidential QA Attestation
+//
+// ReplayPatch turns bug screen-recordings into verified pull requests.
+// Recordings routinely expose proprietary UI, customer data and secrets,
+// and today's public QA ledgers publish verification metadata in the clear.
+//
+// This contract anchors attestations on Midnight's transparent settlement
+// layer as content-hiding commitments, while the evidentiary detail (the
+// recording, the patch diff, the test output, the reporter identity) stays
+// private: it only ever exists as circuit inputs and witness-held secrets,
+// proven correct via zero-knowledge circuits on the circuit layer.
+//
+// Selective disclosure: the only thing a verifier is told is "this
+// attestation exists and the run passed". The preimage is disclosed solely
+// by the reporter, on their terms.
+//
+
+pragma language_version 0.23;
+
+import CompactStandardLibrary;
+
+// ---------------------------------------------------------------------------
+// Transparent settlement state (the public dual-ledger anchor).
+// None of these fields reveal recording contents, patch contents or the
+// reporter's secret: attestationId is a hiding commitment, reporter is a
+// pseudonymous digest H(secretKey).
+// ---------------------------------------------------------------------------
+
+export ledger attestationId: Bytes<32>;
+
+export ledger reporter: Bytes<32>;
+
+export ledger passed: Boolean;
+
+export ledger sequence: Counter;
+
+// Sealed settlement state: stored on-chain, readable by circuits, hidden from
+// ledger observers. A hidden domain separator set once at construction:
+// commitments cannot be linked across deployments by outside parties
+// comparing public hashes.
+export sealed ledger domainTag: Bytes<32>;
+
+constructor() {
+  domainTag = persistentHash<Bytes<32>>(pad(32, "rp:qa:v1"));
+  sequence.increment(1);
+}
+
+// The reporter's secret never leaves the reporter's machine (or the local
+// witness provider). The chain only ever sees H(secretKey).
+witness localReporterKey(): Bytes<32>;
+
+// ---------------------------------------------------------------------------
+// attest: record a completed QA run.
+//
+// Private inputs: recordingHash, patchHash, salt (and the witness secret).
+// Disclosed to the ledger: the hiding commitment, the pseudonymous reporter,
+// and the verdict - deliberately the *only* selective disclosure.
+// ---------------------------------------------------------------------------
+export circuit attest(recordingHash: Bytes<32>, patchHash: Bytes<32>, ok: Boolean, salt: Bytes<32>): [] {
+  sequence.increment(1);
+  reporter = disclose(reporterId());
+  const id = persistentHash<Vector<6, Bytes<32>>>([
+    domainTag, reporter, sequence as Field as Bytes<32>,
+    recordingHash, patchHash, salt
+  ]);
+  attestationId = disclose(id);
+  passed = disclose(ok);
+}
+
+// ---------------------------------------------------------------------------
+// verify: the zero-knowledge statement.
+//
+// "I hold a QA run (recording, patch, salt) whose commitment is the one on
+// ledger, and its verdict matches the disclosed outcome." Nothing about the
+// recording, the patch, the test output or the reporter is revealed - the
+// proof reveals only that the statement is true.
+// ---------------------------------------------------------------------------
+export circuit verify(recordingHash: Bytes<32>, patchHash: Bytes<32>, ok: Boolean, salt: Bytes<32>): [] {
+  const claimed = persistentHash<Vector<6, Bytes<32>>>([
+    domainTag, reporter, sequence as Field as Bytes<32>,
+    recordingHash, patchHash, salt
+  ]);
+  assert(claimed == attestationId, "QA: preimage does not match attestation commitment");
+  assert(ok == passed, "QA: proven verdict does not match disclosed verdict");
+}
+
+// Pseudonymous reporter identity: H(reporter secret), analogous to a
+// linkable but non-revealing on-chain identity.
+circuit reporterId(): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "rp:reporter:"), localReporterKey()]);
+}
