@@ -175,7 +175,11 @@ export default function Results({ result }: { result: AnalysisResult }) {
       )}
 
       {result.ogProof && (
-        <Stage status="ok" title="Committed to 0G Chain">
+        <Stage status="ok" title="QA attestation record">
+          <p className="body-text" style={{ opacity: 0.75 }}>
+            Hashes and verdict are bound into a hiding commitment by the Midnight Compact QA
+            Attestation contract — the recording and patch never touch the ledger.
+          </p>
           <div className="chain-rows">
             <div className="chain-row">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -199,7 +203,7 @@ export default function Results({ result }: { result: AnalysisResult }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                view on 0G Explorer ↗
+                  view archived record ↗
               </a>
             </div>
             {result.ogProof.verifyTxHash && (
@@ -212,7 +216,7 @@ export default function Results({ result }: { result: AnalysisResult }) {
                 <span className="label">Verify tx</span>
                 <span className="hash">{result.ogProof.verifyTxHash.slice(0, 20)}…</span>
                 <a href={result.ogProof.explorerUrl} target="_blank" rel="noopener noreferrer">
-                  view on 0G Explorer ↗
+                view archived record ↗
                 </a>
               </div>
             )}
@@ -221,9 +225,11 @@ export default function Results({ result }: { result: AnalysisResult }) {
       )}
 
       {!result.ogProof && !result.demo && (
-        <Stage status="plain" title="0G integration">
+        <Stage status="plain" title="Midnight attestation layer">
           <p className="body-text">
-            Set <code>OG_CONTRACT_ADDRESS</code> and <code>OG_PRIVATE_KEY</code> in <code>.env</code> to store every verification on 0G Chain.
+            ReplayPatch attests runs through the Compact QA Attestation contract
+            (<code>contracts/compact/qa-attestation.compact</code>): evidence is bound to a hiding
+            commitment, the reporter stays pseudonymous, and only the verdict is disclosed.
           </p>
         </Stage>
       )}

@@ -71,19 +71,16 @@ function IconShield() {
   );
 }
 
-const CONTRACT = "0x43D39f423baf019675D407C0444471da00cbDB11";
-const EXPLORER = "https://chainscan.0g.ai";
-const REPORT_TX = "0xffd6392c9e35c3d25bf388d7c650c60ef8782c774719a185bb03a12d2506167b";
-const VERIFY_TX = "0x1cbccba9cad91826e9947662b7f59332d40ef28f013462b9609518a92bd6ed60";
+const GH_URL = "https://github.com/bernieboy0001/replaypatch/blob/midnight-wave2/contracts/compact/qa-attestation.compact";
 
 function ChainHash({ label, hash, url }: { label: string; hash: string; url: string }) {
   return (
     <div className="chain-row">
       <IconShield />
       <span className="label">{label}</span>
-      <span className="hash">{hash.slice(0, 20)}…</span>
+      <span className="hash">{hash.length > 20 ? hash.slice(0, 20) + "…" : hash}</span>
       <a href={url} target="_blank" rel="noopener noreferrer">
-        view on 0G Explorer ↗
+        view on GitHub ↗
       </a>
     </div>
   );
@@ -140,7 +137,7 @@ export default function Uploader() {
             GitHub
           </a>
           <div className={"pill " + (result ? (result.demo ? "demo" : "live") : "")}>
-            {result ? (result.demo ? "DEMO MODE" : "LIVE") : "v0.1"}
+            {result ? (result.demo ? "DEMO MODE" : "LIVE") : "WAVE 2"}
           </div>
         </div>
       </nav>
@@ -149,7 +146,7 @@ export default function Uploader() {
         <Reveal>
           <span className="eyebrow">
             <span className="dot" />
-            Autonomous QA · Built for 0G
+            Autonomous QA · Built for Midnight
           </span>
           <h1>
             Turn a bug video into <span className="hl">a verified pull request.</span>
@@ -157,8 +154,8 @@ export default function Uploader() {
           <p className="sub">
             Drop a screen recording of a broken flow. ReplayPatch reconstructs the repro steps with{" "}
             <span className="accent">GPT-5.5</span>, writes a Playwright test that catches it, patches
-            the source, reruns to green — and commits the whole audit trail to{" "}
-            <span className="accent">0G Chain</span>.
+            the source, reruns to green — and records a content-hiding attestation on{" "}
+            <span className="accent">Midnight</span>.
           </p>
           <div className="hero-chips">
             <span className="chip-line">
@@ -174,7 +171,7 @@ export default function Uploader() {
               Fix verified on rerun
             </span>
             <span className="chip-line">
-              <b>▣ 0G</b> on-chain record
+              <b>▣ Midnight</b> content-hiding attestation
             </span>
           </div>
         </Reveal>
@@ -316,8 +313,8 @@ export default function Uploader() {
                   icon: <IconChain />,
                   cls: "is-3",
                   step: "04",
-                  title: "On 0G",
-                  text: "Recording hash, patch hash and verification are committed to QAVerifier on 0G Chain — auditable forever.",
+                  title: "On Midnight",
+                  text: "The Compact QA Attestation contract binds recording hash, patch hash and verdict into a hiding commitment — proof goes on-chain, content never does.",
                 },
               ].map((s, i) => (
                 <div className={"step-card " + s.cls} key={s.step} style={{ position: "relative" }}>
@@ -338,26 +335,27 @@ export default function Uploader() {
                   <span className="shield">
                     <IconShield />
                   </span>
-                  Live on 0G Mainnet
+                  Content-hiding attestations on Midnight
                 </div>
-                <span className="chain-status">● CHAIN 16661</span>
+                <span className="chain-status">● COMPACT 0.31.1 · LANG 0.23</span>
               </div>
               <div className="chain-rows">
                 <div className="chain-row">
                   <IconShield />
-                  <span className="label">QAVerifier contract</span>
-                  <span className="hash">{CONTRACT.slice(0, 20)}…</span>
-                  <a href={EXPLORER + "/address/" + CONTRACT} target="_blank" rel="noopener noreferrer">
-                    view on 0G Explorer ↗
+                  <span className="label">QA Attestation contract</span>
+                  <span className="hash">qa-attestation.compact</span>
+                  <a href={GH_URL} target="_blank" rel="noopener noreferrer">
+                    view on GitHub ↗
                   </a>
                 </div>
-                <ChainHash label="report() tx" hash={REPORT_TX} url={EXPLORER + "/tx/" + REPORT_TX} />
-                <ChainHash label="verify() tx" hash={VERIFY_TX} url={EXPLORER + "/tx/" + VERIFY_TX} />
+                <ChainHash label="attest() circuit" hash="content-hiding commitment" url={GH_URL} />
+                <ChainHash label="verify() circuit" hash="ZK proof, no reveal" url={GH_URL} />
               </div>
               <p className="chain-note">
-                Every bug fix ReplayPatch ships is a verifiable on-chain audit record — recording
-                hash, test result, and patch hash linked together on 0G. No more “trust me, it
-                passes.”
+                Every bug fix ReplayPatch ships produces a hiding commitment on Midnight —
+                recording hash, patch hash and verdict are bound together, the reporter stays
+                pseudonymous, and the evidence itself never leaves your machine. Auditable
+                without leaking the bug.
               </p>
             </div>
           </Reveal>
@@ -367,11 +365,11 @@ export default function Uploader() {
       <footer className="footer">
         <div className="f-left">
           Replay<b>Patch</b> · AI QA you can audit
-          <span style={{ opacity: 0.5 }}>· for 0G Bridge by AKINDO</span>
+          <span style={{ opacity: 0.5 }}>· for Midnight Buildathon by AKINDO</span>
         </div>
         <div className="f-right">
-          <a href={EXPLORER + "/address/" + CONTRACT} target="_blank" rel="noopener noreferrer">
-            0G Mainnet
+          <a href="https://docs.midnight.network/" target="_blank" rel="noopener noreferrer">
+            Midnight
           </a>
           <a href="https://github.com/bernieboy0001/replaypatch" target="_blank" rel="noopener noreferrer">
             Source
